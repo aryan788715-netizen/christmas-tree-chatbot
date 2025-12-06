@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Tree Knowledge Bot 🎄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f4c3a 0%, #1a7a5e 50%, #2d5016 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #0f4c3a 0%, #1a7a5e 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .chat-header p {
+            opacity: 0.95;
+            font-size: 0.95em;
+        }
+
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: linear-gradient(to bottom, #f9f9f9 0%, #ffffff 100%);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .message.bot .message-content {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1b5e20;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #2d5016;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #0f4c3a 0%, #1a7a5e 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #2d5016;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background: #1a7a5e;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+            30% { transform: translateY(-12px); opacity: 1; }
+        }
+
+        .quick-replies {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 0 25px;
+        }
+
+        .quick-reply-btn {
+            padding: 10px 18px;
+            background: white;
+            border: 2px solid #1a7a5e;
+            color: #1a7a5e;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .quick-reply-btn:hover {
+            background: #1a7a5e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 122, 94, 0.3);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: #1a7a5e;
+            box-shadow: 0 0 0 3px rgba(26, 122, 94, 0.1);
+        }
+
+        #send-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f4c3a 0%, #1a7a5e 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        #send-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 5px 15px rgba(26, 122, 94, 0.4);
+        }
+
+        #send-button svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .bot-icon {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a7a5e;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0f4c3a;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🎄 Christmas Tree Expert Bot</h1>
+            <p>Ask me anything about Christmas trees - history, environment, traditions & more!</p>
+        </div>
+        
+        <div id="chat-messages">
+            <div class="message bot">
+                <div class="message-content">
+                    <span class="bot-icon">🎄</span>
+                    <strong>Hello!</strong> I'm your Christmas Tree Knowledge Expert. I can tell you fascinating facts about Christmas tree history, environmental impacts, traditions, and help you decide between real vs artificial trees. What would you like to know?
+                </div>
+            </div>
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="quick-replies">
+            <button class="quick-reply-btn" onclick="sendQuickReply('Tell me about Christmas tree history')">📜 History</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Real vs artificial trees?')">🌲 Real vs Fake</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Environmental impact?')">🌍 Environment</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('How many trees are sold?')">📊 Statistics</button>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Ask me about Christmas trees..." />
+            <button id="send-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+        const typingIndicator = document.querySelector('.typing-indicator');
+
+        // Knowledge Base
+        const knowledgeBase = {
+            history: {
+                keywords: ['history', 'origin', 'started', 'began', 'first', 'queen charlotte', 'tradition', 'when', 'germany', 'german'],
+                response: "🏰 The Christmas tree tradition has a fascinating history! In 1800, Queen Charlotte, the German wife of King George III, set up what's thought to be the first Christmas tree in England at Queen's Lodge in Windsor. While decorated Christmas trees already had a long history in Germany, this marked the beginning of their role as a fashionable part of the festive season for English upper classes. By the 1850s, they were common across the UK! In the US, German settlers helped establish the tradition of displaying trees decorated with homemade ornaments by the 1830s."
+            },
+            sales: {
+                keywords: ['how many', 'sold', 'sales', 'statistics', 'numbers', 'million', 'market'],
+                response: "📊 The numbers are impressive! Today, an estimated 25-30 million real Christmas trees are sold annually in the US, and around 5 million in the UK. That's a lot of festive cheer! 🎄"
+            },
+            millennials: {
+                keywords: ['millennial', 'young', 'generation', 'trend', 'popular', 'comeback', 'baby boomer'],
+                response: "📈 Interesting trend alert! Real trees may be coming back into fashion among younger generations. A 2019 US survey found that millennials are 82% more likely than baby boomers to get a live tree. The tradition is alive and well with the younger crowd! 🌲"
+            },
+            environmental: {
+                keywords: ['environment', 'climate', 'green', 'eco', 'sustainable', 'carbon', 'impact', 'pros', 'cons'],
+                response: "🌍 Great question! Scientists say the environmental pros and cons of Christmas trees go far beyond just 'real or plastic'. The climate impact involves multiple factors including:\n\n• Carbon sequestration during growth\n• Transportation emissions\n• End-of-life disposal (composting vs landfill)\n• Plastic production and longevity\n• Pesticide use in tree farms\n\nIt's not a simple answer - both options have trade-offs that depend on various factors like how long you keep an artificial tree and how you dispose of a real one."
+            },
+            realVsFake: {
+                keywords: ['real', 'fake', 'artificial', 'plastic', 'vs', 'versus', 'better', 'which', 'choose', 'best'],
+                response: "🎄 The real vs artificial debate is complex! Here's what to consider:\n\n**Real Trees:**\n✅ Renewable resource\n✅ Biodegradable\n✅ Support local farms\n✅ Authentic smell & experience\n❌ Annual purchase needed\n❌ Transportation impact\n\n**Artificial Trees:**\n✅ Reusable for years\n✅ No needle cleanup\n❌ Plastic production impact\n❌ Eventually becomes waste\n\nScientists say it's not just about 'real or plastic' - the best choice depends on factors like how long you keep an artificial tree (typically needs 8-10 years to offset environmental cost) and how you dispose of a real one!"
+            },
+            wastefulness: {
+                keywords: ['waste', 'wasteful', 'overindulgent', 'worth', 'debate', 'essential'],
+                response: "🤔 This is a common internal debate! Many people, including millennials who love real trees, have countless conversations about whether getting one is overindulgent wastefulness or an essential part of Christmas. The environmental impact is actually more nuanced than it seems - it's not negligible, but it's also not as simple as 'wasteful vs eco-friendly'. The key is making informed choices about sourcing, care, and disposal! 🌲"
+            },
+            uk: {
+                keywords: ['uk', 'britain', 'british', 'england', 'windsor'],
+                response: "🇬🇧 In the UK, the Christmas tree tradition started with Queen Charlotte in 1800 at Windsor. By the 1850s, Christmas trees were a common sight across the UK! Today, around 5 million real Christmas trees are sold annually in Britain. The tradition that started with royalty is now enjoyed by millions! 👑🎄"
+            },
+            us: {
+                keywords: ['us', 'usa', 'america', 'american', 'united states'],
+                response: "🇺🇸 In the United States, German settlers helped establish the Christmas tree tradition by the 1830s, decorating trees with homemade ornaments. Today, the US market is huge - an estimated 25-30 million real Christmas trees are sold annually! And millennials are driving a resurgence, being 82% more likely than baby boomers to choose live trees. 🌲"
+            },
+            decorations: {
+                keywords: ['decorate', 'decoration', 'ornament', 'bauble', 'lights'],
+                response: "✨ The tradition of decorating Christmas trees has evolved beautifully! Early German settlers in the US decorated their trees with homemade ornaments in the 1830s. Today's tradition of 'plonking a newly cut tree in the middle of the living room and covering it with lights and baubles' has been cherished for nearly two centuries! 🎄💡"
+            }
+        };
+
+        // AI Response Engine
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Check each knowledge category
+            for (const [category, data] of Object.entries(knowledgeBase)) {
+                if (data.keywords.some(keyword => lowerMessage.includes(keyword))) {
+                    return data.response;
+                }
+            }
+
+            // Greetings
+            if (lowerMessage.match(/^(hi|hello|hey|greetings)/)) {
+                return "🎄 Hello! I'm here to share fascinating insights about Christmas trees. Ask me about their history, environmental impact, real vs artificial trees, or any statistics you're curious about!";
+            }
+
+            // Thanks
+            if (lowerMessage.includes('thank')) {
+                return "🎄 You're very welcome! Feel free to ask me anything else about Christmas trees. I'm here to help make your holiday decisions easier!";
+            }
+
+            // Default intelligent response
+            return "🤔 That's an interesting question! While I specialize in Christmas tree history, environmental impacts, and the real vs artificial debate, I don't have specific information about that. Try asking me about:\n\n• Christmas tree history and origins\n• Environmental pros and cons\n• Real vs artificial tree comparison\n• Sales statistics and trends\n• Millennial preferences\n\nWhat would you like to know? 🎄";
+        }
+
+        // Send message function
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            typingIndicator.classList.add('active');
+
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+                const response = getAIResponse(message);
+                addMessage(response, 'bot');
+            }, 800 + Math.random() * 1200);
+        }
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (sender === 'bot') {
+                contentDiv.innerHTML = '<span class="bot-icon">🎄</span>' + text;
+            } else {
+                contentDiv.textContent = text;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.insertBefore(messageDiv, typingIndicator);
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Quick reply function
+        function sendQuickReply(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Focus input on load
+        userInput.focus();
+    </script>
+</body>
+</html>
